@@ -119,6 +119,33 @@ describe("ga4Client admin API", () => {
     },
   );
 
+  it("reads a key event whose zero default value omits numericValue", async () => {
+    mocks.fetch.mockResolvedValue(
+      jsonResponse({
+        keyEvents: [
+          {
+            name: "properties/123/keyEvents/1",
+            eventName: "demo_scheduled",
+            countingMethod: "ONCE_PER_SESSION",
+            defaultValue: { currencyCode: "USD" },
+          },
+        ],
+      }),
+    );
+    await expect(
+      createGa4AdminClient({
+        userId: "u1",
+        ga4AccountId: "google-sub-a",
+      }).listKeyEvents("properties/123"),
+    ).resolves.toEqual([
+      {
+        eventName: "demo_scheduled",
+        countingMethod: "ONCE_PER_SESSION",
+        defaultValue: { numericValue: 0, currencyCode: "USD" },
+      },
+    ]);
+  });
+
   it("throws a token error when no access token can be minted", async () => {
     mocks.getAccessToken.mockRejectedValue(new Error("revoked"));
     await expect(

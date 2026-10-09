@@ -85,7 +85,8 @@ const keyEventSchema = z.object({
   custom: z.boolean().optional(),
   countingMethod: z.string(),
   defaultValue: z
-    .object({ numericValue: z.number(), currencyCode: z.string() })
+    // Proto3 JSON omits zero, so a 0 default arrives as just a currency.
+    .object({ numericValue: z.number().default(0), currencyCode: z.string() })
     .optional(),
 });
 const keyEventsResponseSchema = z.object({
